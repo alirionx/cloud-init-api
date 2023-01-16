@@ -1,42 +1,52 @@
 import os
+import time
+import json
 import yaml
 from io import BytesIO, StringIO
+from uuid import uuid4
 import pycdlib
 
 from data_models import CloudConfig, NetworkConfig
 
 #-The Classes/Tools-----------------------------------
-class IsoCreator:
+class CloudInitIsoCreator:
+  iso_dir = "./data/isos"
+  meta_dir = "./data/meta"
+
   def __init__(self, cloud_config:CloudConfig):
     
+    self.cloud_config = cloud_config
+
     self.meta_data_str = None
     self.user_data_str = None
     self.network_config_str = None
 
-    self.iso_filename = "default.iso"
-    self.iso_dir = "./isos"
+    self.iso_id = str(uuid4())
+    self.iso_filename = "%s.iso" %self.iso_id
+    # self.iso_filename = "default.iso"
 
     #-----
     self.meta_data = self.remove_none_values(
-      cloud_config.meta_data.dict()
+      self.cloud_config.meta_data.dict()
     )
     self.user_data = self.remove_none_values(
-      cloud_config.user_data.dict()
+      self.cloud_config.user_data.dict()
     )
 
     #-----
-    if cloud_config.network_config:
-      self.map_network_conf(item=cloud_config.network_config)
+    if self.cloud_config.network_config:
+      self.map_network_conf(item=self.cloud_config.network_config)
     else:
       self.user_data = None
 
     #-----
     self.create_yaml_strs()
+    self.check_tgt_path()
 
   #-------------------------------
   def check_tgt_path(self):
-    if not os.path.isdir(self.iso_dir):
-      os.makedirs(self.iso_dir)
+    os.makedirs(self.iso_dir, exist_ok=True)
+    os.makedirs(self.meta_dir, exist_ok=True)
 
   #-------------------------------
   def remove_none_values(self, obj):
@@ -84,8 +94,28 @@ class IsoCreator:
     self.network_config_str = yaml.dump(self.network_config)
     
   #-------------------------------
+  def write_cloudinit_metadata(self):
+    tgt_file_path = os.path.join(self.meta_dir, self.iso_id)
+    item = {
+      "iso_id": self.iso_filename,
+      "iso_filename": self.iso_filename,
+      "meta_timestamp": int(time.time()),
+      "class_config_data": self.cloud_config.dict(),
+      "cloud_config_data": {
+        "meta-data": self.meta_data_str,
+        "user-data": self.user_data_str,
+        "network-config": self.network_config_str
+      }
+    }
+
+    with open(tgt_file_path, "w") as fl:
+      fl.write(
+        json.dumps(item, indent=2) 
+      )
+
+
+  #-------------------------------
   def write_cloudinit_iso(self):
-    self.check_tgt_path()
     tgt_file_path = os.path.join(self.iso_dir, self.iso_filename)
     
     #-----
@@ -136,8 +166,61 @@ class IsoCreator:
     iso.write( tgt_file_path )
     iso.close()
 
-    
+  #-------------------------------
+  @staticmethod
+  def list_isos():
+    res = []
+    for filename in os.listdir(CloudInitIsoCreator.meta_dir):
+      filepath = os.path.join(CloudInitIsoCreator.meta_dir, filename)
+      with open(filepath, "r") as fl:
+        json_str = fl.read()
+        try: 
+          item = json.loads(json_str)
+        except Exception as e:
+          print(e)
+          continue
+        res.append(item)
+    return res
 
+  #-------------------------------
+  @staticmethod
+  def delete_iso_by_id(iso_id:str):
+    meta_filepath = os.path.join(CloudInitIsoCreator.meta_dir, iso_id)
+    if not os.path.isfile(meta_filepath):
+      raise Exception("ISO with id '%s' not found" %iso_id)
+
+    with open(meta_filepath, "r") as fl:
+      item = json.loads(fl.read())
+    
+    iso_filename = item["iso_filename"]
+    iso_filepath = os.path.join(CloudInitIsoCreator.iso_dir, iso_filename)
+    os.unlink(meta_filepath)
+    os.unlink(iso_filepath)
+
+  #-------------------------------
+  @staticmethod
+  def get_raw_file_from_iso(iso_id:str, filename:str):
+    meta_filepath = os.path.join(CloudInitIsoCreator.meta_dir, iso_id)
+    if not os.path.isfile(meta_filepath):
+      raise Exception("ISO with id '%s' not found" %iso_id)
+
+    with open(meta_filepath, "r") as fl:
+      item = json.loads(fl.read())
+    
+    iso_filename = item["iso_filename"]
+    iso_filepath = os.path.join(CloudInitIsoCreator.iso_dir, iso_filename)
+
+    iso = pycdlib.PyCdlib()
+    iso.open(filename=iso_filepath)
+    extracted = BytesIO()
+    try:
+      iso.get_file_from_iso_fp(extracted, iso_path='/%s.;1' %filename.upper().replace("-", ""))
+    except:
+      raise Exception("could not extract file '%s' from iso '%s'" %(filename, iso_id) )
+    iso.close()
+    return extracted.getvalue().decode('utf-8')
+
+  
   
   #-------------------------------
 

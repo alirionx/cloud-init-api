@@ -1,7 +1,8 @@
+import json
 import yaml
 
 from data_models import CloudConfig, User
-from tools import IsoCreator
+from tools import CloudInitIsoCreator
 import passlib.hash
 
 
@@ -26,13 +27,13 @@ my_passwd_hash =  passlib.hash.sha512_crypt.hash("daniel")
 cloud_config = {
   "meta_data": {
     "instance_id": "palim",
-    "local_hostname": "palim",
+    "local_hostname": "meinevm",
     # "cloud_n.ame": "hyperV",
     "distro": "ubuntu",
     "distro_version": "20.04",
   },
   "user_data": { 
-    "groups": ["penners"],
+    "groups": ["tester"],
     "users": [
       {
         "name": "daniel",
@@ -54,7 +55,7 @@ cloud_config = {
   "network_config": {
     "dhcp4": False,
     "ip4_cidrs": [
-      "172.18.208.10/20",
+      "172.18.208.11/20",
       "192.168.0.44/24",
     ],
     "ip4_gw": "172.18.208.1",
@@ -70,11 +71,14 @@ cloud_config = {
   }
 }
 
-myCloudConfig = CloudConfig(**cloud_config)
-# print( yaml.dump(myCloudConfig.dict()) )
+# myCloudConfig = CloudConfig(**cloud_config)
+# myIso = CloudInitIsoCreator(cloud_config=myCloudConfig)
+# # myIso.iso_filename = "ubuntu_cloudinit_test.iso"
+# myIso.write_cloudinit_metadata()
+# myIso.write_cloudinit_iso()
 
-myIso = IsoCreator(cloud_config=myCloudConfig)
-myIso.iso_filename = "ubuntu_cloudinit_test.iso"
-myIso.write_cloudinit_iso()
 
-# print(myIso.meta_data_str)
+# res = CloudInitIsoCreator.list_isos()
+# print(json.dumps(res, indent=2))
+
+CloudInitIsoCreator.delete_iso_by_id(iso_id="99855fae-dea2-42c1-b0a9-8e002a1c063f")

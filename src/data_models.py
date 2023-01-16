@@ -24,7 +24,7 @@ class MetaData(BaseModel):
 #---------------------
 class User(BaseModel):
   name: str
-  groups: List[str] | None = None
+  groups: list[str] | None = None
   passwd: str | None = None
   chpasswd: str| None = "{ expire: False }"
   lock_passwd: bool | None = False
@@ -49,6 +49,14 @@ class CloudConfig(BaseModel):
   network_config: NetworkConfig | None = None
 
 #---------------------
+
+
+#---------------------
+class IsoMetaData(BaseModel):
+  iso_id: str 
+  meta_timestamp: int
+  class_config_data: CloudConfig
+  cloud_config_data: dict
 
 #---------------------
 
