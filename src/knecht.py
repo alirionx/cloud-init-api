@@ -15,10 +15,6 @@ my_passwd_hash =  passlib.hash.sha512_crypt.hash("daniel")
 #----------------------------------
 
 
-
-
-
-
 # myUser = User(**user)
 # myIso.add_user(data=myUser)
 # myIso.create_userdata_str()
@@ -31,7 +27,7 @@ cloud_config = {
   "meta_data": {
     "instance_id": "palim",
     "local_hostname": "palim",
-    # "cloud_name": "hyperV",
+    # "cloud_n.ame": "hyperV",
     "distro": "ubuntu",
     "distro_version": "20.04",
   },
@@ -51,32 +47,21 @@ cloud_config = {
     ]
   },
   "network_config": {
-    "version": 1,
-    "config": [  
-      {
-        "type": "physical",
-        "name": "eth0",
-        "subnets": [
-          {
-            "type": "static",
-            "address": "172.18.208.10",
-            "netmask": "255.255.240.0",
-            "gateway": "172.18.208.1",
-          }
-        ],
-      },
-      {
-        "type": "nameserver",
-        "name": "eth0",
-        "address": [
-          "192.168.10.100",
-          "8.8.8.8"
-        ],
-        "search":[
-          "app-scape.lab"
-        ]
-      }
-    ]
+    "dhcp4": False,
+    "ip4_cidrs": [
+      "172.18.208.10/20",
+      "192.168.0.44/24",
+    ],
+    "ip4_gw": "172.18.208.1",
+    "nameservers": [
+      "192.168.10.1",
+      "8.8.8.8"
+    ],
+    "searches": [
+      "app-scape.lab",
+      "app-scape.de"
+    ],
+
   }
 }
 

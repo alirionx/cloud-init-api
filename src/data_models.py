@@ -5,8 +5,13 @@ from typing import List, Optional, Literal
 #-The Data Models-------------------------------------
 
 class NetworkConfig(BaseModel):
-  version: int | None = None
-  config: list | None = None
+  src_nic_match: str | None = "eth*"
+  tgt_nic_name: str | None = "eth0"
+  dhcp4: bool | None = True
+  ip4_cidrs: list[str] | None = []
+  ip4_gw: str | None = None
+  nameservers: list[str] | None = []
+  searches: list[str] | None = []
 
 #---------------------
 class MetaData(BaseModel):
@@ -35,11 +40,12 @@ class UserData(BaseModel):
 
 #---------------------
 class CloudConfig(BaseModel):
-  meta_data: MetaData
-  user_data: UserData
-  network_config: NetworkConfig
+  meta_data: MetaData | None = None
+  user_data: UserData | None = None
+  network_config: NetworkConfig | None = None
 
 #---------------------
 
 #---------------------
-  
+
+#------------------------------------------------------
