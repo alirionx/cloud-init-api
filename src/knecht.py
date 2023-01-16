@@ -42,7 +42,12 @@ cloud_config = {
         "ssh_pwauth": True,
         "ssh_authorized_keys": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDXp0D0tDZRNxlGcUN/tpVbt7BZCVmdXjJYUbj+BVLc65tjf8gNEY3vCv/gFecW1807TipRnkQ9TGFLXDN7BZ06lXX5VUNS7AFiXY+iGAvJsGLWy6+VLbyBMlNeK+vFQ0GKnQDa7nrVF84uh8Oh6bQ7Jgbtx8HOIDv6Pp4RIDK5X/BWUOfWpeSipXnk1k0c6kv0Hz3B8XzbutgA5YYNabOLIryMMf+07ntCB6dg55nNgItjiw9ogG3EcEshEDJI4T1K4d5EIHc75CxPjGjDLiEjzclsGjldtSTbB+SG7qM4ZTeEb5OSL+Pm225z5xy7AbOVUqEofysKMYNhEpePkY7F",
         "sudo": "ALL=(ALL) NOPASSWD:ALL",
-        "shell": "/bin/bash"
+        "shell": "/bin/bash",
+        "package_update": True,
+        "packages": [
+          "iputils-ping",
+          "git"
+        ],
       }
     ]
   },
