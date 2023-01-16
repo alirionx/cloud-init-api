@@ -45,6 +45,18 @@ async def api_isos_get():
   return res
 
 #--------------------
+@app.get("/api/iso/{id}", tags=["iso"] )
+def api_iso_get(id):
+  try:
+    stream = CloudInitIsoCreator.get_iso_as_byte(iso_id=id)
+  except Exception as e:
+    return HTTPException(status_code=400, detail=str(e))
+  return StreamingResponse(
+    stream,
+    headers={'Content-Disposition': 'attachment; filename="%s.iso"' %id}
+  )
+
+#--------------------
 @app.get("/api/isos/raw/{id}/{filename}", tags=["meta"] )
 async def api_iso_conf_file_get(id, filename):
   try:

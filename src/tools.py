@@ -97,7 +97,7 @@ class CloudInitIsoCreator:
   def write_cloudinit_metadata(self):
     tgt_file_path = os.path.join(self.meta_dir, self.iso_id)
     item = {
-      "iso_id": self.iso_filename,
+      "iso_id": self.iso_id,
       "iso_filename": self.iso_filename,
       "meta_timestamp": int(time.time()),
       "class_config_data": self.cloud_config.dict(),
@@ -184,30 +184,31 @@ class CloudInitIsoCreator:
 
   #-------------------------------
   @staticmethod
+  def get_iso_filename_by_id(iso_id:str):
+    meta_filepath = os.path.join(CloudInitIsoCreator.meta_dir, iso_id)
+    if not os.path.isfile(meta_filepath):
+      raise Exception("ISO with id '%s' not found" %iso_id)
+    with open(meta_filepath, "r") as fl:
+      item = json.loads(fl.read())
+    iso_filename = item["iso_filename"]
+    return iso_filename
+
+  #-------------------------------
+  @staticmethod
   def delete_iso_by_id(iso_id:str):
     meta_filepath = os.path.join(CloudInitIsoCreator.meta_dir, iso_id)
     if not os.path.isfile(meta_filepath):
       raise Exception("ISO with id '%s' not found" %iso_id)
-
-    with open(meta_filepath, "r") as fl:
-      item = json.loads(fl.read())
     
-    iso_filename = item["iso_filename"]
+    iso_filename = CloudInitIsoCreator.get_iso_filename_by_id(iso_id=iso_id)
     iso_filepath = os.path.join(CloudInitIsoCreator.iso_dir, iso_filename)
     os.unlink(meta_filepath)
     os.unlink(iso_filepath)
 
   #-------------------------------
   @staticmethod
-  def get_raw_file_from_iso(iso_id:str, filename:str):
-    meta_filepath = os.path.join(CloudInitIsoCreator.meta_dir, iso_id)
-    if not os.path.isfile(meta_filepath):
-      raise Exception("ISO with id '%s' not found" %iso_id)
-
-    with open(meta_filepath, "r") as fl:
-      item = json.loads(fl.read())
-    
-    iso_filename = item["iso_filename"]
+  def get_raw_file_from_iso(iso_id:str, filename:str):    
+    iso_filename = CloudInitIsoCreator.get_iso_filename_by_id(iso_id=iso_id)
     iso_filepath = os.path.join(CloudInitIsoCreator.iso_dir, iso_filename)
 
     iso = pycdlib.PyCdlib()
@@ -220,9 +221,17 @@ class CloudInitIsoCreator:
     iso.close()
     return extracted.getvalue().decode('utf-8')
 
-  
-  
   #-------------------------------
+  @staticmethod
+  def get_iso_as_byte(iso_id:id):
+    iso_filename = CloudInitIsoCreator.get_iso_filename_by_id(iso_id=iso_id)
+    iso_filepath = os.path.join(CloudInitIsoCreator.iso_dir, iso_filename)
+    with open(iso_filepath, "rb") as fl:
+      yield from fl
+
+  #-------------------------------
+  #-------------------------------
+  
 
   
     
