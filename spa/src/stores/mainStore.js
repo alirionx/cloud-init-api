@@ -6,16 +6,15 @@ export const useMainStore = defineStore({
   id: 'mainStore', 
   state: () => {
     return {
-      isos: []   
+      isos: []
     }
   },
   actions: {
     call_isos(){
       axios.get("/api/isos")
       .then((response)=>{
-        console.log(response.status)
+        // console.log(response.status)
         this.isos =  response.data
-
       })
       .catch((err)=>{
         console.error(err)

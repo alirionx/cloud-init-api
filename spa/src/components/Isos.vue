@@ -1,21 +1,26 @@
 <template>
-  <div class="Isos">
-    <div class="hl">{{title}}</div>
-    <table>
-      <thead>
-        <tr>
-          <th>Iso Id</th>
-          <th>Meta Timestamp</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(item, idx) in store.isos" :key="idx">
-          <td>{{ item.iso_id }}</td>
-          <td>{{ item.meta_timestamp }}</td>
-        </tr>
+  <div class="pagePartDiv">
+    <div class="pagePartBar" @click="switch_component()">
+      <div class="title">{{title}}</div>
+      <div class="arrow " :class="{aUp: active, aDown: !active}"></div>
+    </div>
+    <div class="pagePartContentFrame" v-if="active">
+      <table>
+        <thead>
+          <tr>
+            <th>Iso Id</th>
+            <th>Meta Timestamp</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item, idx) in store.isos" :key="idx">
+            <td>{{ item.iso_id }}</td>
+            <td>{{ item.meta_timestamp }}</td>
+          </tr>
 
-      </tbody>
-    </table>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -24,7 +29,6 @@
 import { useMainStore } from '@/stores/mainStore'
 
 export default{
-  
   name: "Isos",
   setup(){
     const store = useMainStore()
@@ -32,7 +36,14 @@ export default{
   }, 
   data(){
     return {
-      title: "Stored CloudInit Isos"
+      id: "isos",
+      title: "Stored CloudInit Isos",
+      active: false
+    }
+  },
+  methods:{
+    switch_component(){
+      this.active = !this.active
     }
   }
 }

@@ -4,11 +4,13 @@
 
   <main>
     <Isos />
+    <!-- <Test /> -->
   </main>
 </template>
 
 <script>
 import Isos from '@/components/Isos.vue'
+import Test from '@/components/Test.vue'
 import { useMainStore } from '@/stores/mainStore'
 
 export default{
@@ -19,7 +21,8 @@ export default{
     
   },
   components:{
-    Isos
+    Isos,
+    Test
   }
 }
 </script>
