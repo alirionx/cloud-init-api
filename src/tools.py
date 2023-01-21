@@ -5,6 +5,7 @@ import yaml
 from io import BytesIO, StringIO
 from uuid import uuid4
 import pycdlib
+import passlib.hash
 
 from data_models import CloudConfig, NetworkConfig
 
@@ -37,7 +38,7 @@ class CloudInitIsoCreator:
     if self.cloud_config.network_config:
       self.map_network_conf(item=self.cloud_config.network_config)
     else:
-      self.user_data = None
+      self.network_config = None
 
     #-----
     self.create_yaml_strs()
@@ -89,14 +90,26 @@ class CloudInitIsoCreator:
     self.meta_data_str = yaml.dump(tmp_item) 
 
     #----------
-    self.user_data_str = "#cloud-config\n\n" + yaml.dump(self.user_data)
+    tmp_lst = []
+    for item in self.user_data["users"]:
+      if "passwd" in item:
+        item["passwd"] = passlib.hash.sha512_crypt.hash(item["passwd"])
+    tmp_lst.append(item)
 
-    self.network_config_str = yaml.dump(self.network_config)
+    tmp_dic = self.user_data.copy()
+    tmp_dic["users"] = tmp_lst
+
+    self.user_data_str = "#cloud-config\n\n" + yaml.dump(tmp_dic)
+
+    #----------
+    if self.network_config:
+      self.network_config_str = yaml.dump(self.network_config)
     
   #-------------------------------
   def write_cloudinit_metadata(self):
     tgt_file_path = os.path.join(self.meta_dir, self.iso_id)
     item = {
+      "name": self.cloud_config.name,
       "iso_id": self.iso_id,
       "iso_filename": self.iso_filename,
       "meta_timestamp": int(time.time()),
@@ -152,15 +165,16 @@ class CloudInitIsoCreator:
     )
 
     #-----
-    network_config_file = BytesIO(  
-      self.network_config_str.encode())
-    iso.add_fp(
-      network_config_file, 
-      len(self.network_config_str), 
-      '/NETWORKCONFIG.;1', 
-      rr_name="network-config",
-      joliet_path="/network-config"
-    )
+    if self.network_config:
+      network_config_file = BytesIO(  
+        self.network_config_str.encode())
+      iso.add_fp(
+        network_config_file, 
+        len(self.network_config_str), 
+        '/NETWORKCONFIG.;1', 
+        rr_name="network-config",
+        joliet_path="/network-config"
+      )
 
     #-----
     iso.write( tgt_file_path )

@@ -22,6 +22,20 @@ export const useMainStore = defineStore({
       .finally(()=>{
 
       })
+    },
+    delete_iso_by_idx(idx){
+      let iso_id = this.isos[idx].iso_id
+      axios.delete("/api/iso/"+iso_id)
+      .then((response)=>{
+        // console.log(response.status)
+        this.isos.splice(idx, 1)
+      })
+      .catch((err)=>{
+        console.error(err)
+      })
+      .finally(()=>{
+
+      })
     }
   }
 })

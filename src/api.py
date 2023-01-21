@@ -75,7 +75,10 @@ async def api_iso_post(item:CloudConfig):
   return { "iso_id": myIso.iso_id }
 
 #--------------------
-
+@app.delete("/api/iso/{id}", tags=["iso"])
+async def api_iso_post(id):
+  myIso = CloudInitIsoCreator.delete_iso_by_id(iso_id=id)
+  return { "iso_id": id }
 
 #--------------------
 

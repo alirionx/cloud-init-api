@@ -22,11 +22,11 @@ body {
   border: 1px solid rgb(62, 79, 93);
   display: table;
   min-width: 1024px;
-  width: 94%;
+  width: 92%;
   margin: 30px auto 6px auto;
   border-radius: 4px;
   background-color: #fff;
-  box-shadow: 1px 3px 6px #222;
+  box-shadow: 0px 3px 6px #222;
 }
 
 .pagePartDiv .pagePartBar{

@@ -4,3 +4,4 @@ Pipfile
 isos/
 data/
 proxmox-examples/
+api_test.json

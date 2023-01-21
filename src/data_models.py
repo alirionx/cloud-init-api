@@ -44,8 +44,9 @@ class UserData(BaseModel):
 
 #---------------------
 class CloudConfig(BaseModel):
-  meta_data: MetaData | None = None
-  user_data: UserData | None = None
+  name: str 
+  meta_data: MetaData 
+  user_data: UserData 
   network_config: NetworkConfig | None = None
 
 #---------------------
@@ -53,6 +54,7 @@ class CloudConfig(BaseModel):
 
 #---------------------
 class IsoMetaData(BaseModel):
+  name: str 
   iso_id: str 
   meta_timestamp: int
   class_config_data: CloudConfig
