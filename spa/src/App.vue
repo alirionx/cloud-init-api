@@ -3,14 +3,14 @@
   </header>
 
   <main>
+    <Form />
     <Isos />
-    <!-- <Test /> -->
   </main>
 </template>
 
 <script>
 import Isos from '@/components/Isos.vue'
-import Test from '@/components/Test.vue'
+import Form from '@/components/Form.vue'
 import { useMainStore } from '@/stores/mainStore'
 
 export default{
@@ -22,7 +22,7 @@ export default{
   },
   components:{
     Isos,
-    Test
+    Form
   }
 }
 </script>

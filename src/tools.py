@@ -5,7 +5,8 @@ import yaml
 from io import BytesIO, StringIO
 from uuid import uuid4
 import pycdlib
-import passlib.hash
+# import passlib.hash
+import bcrypt
 
 from data_models import CloudConfig, NetworkConfig
 
@@ -93,7 +94,10 @@ class CloudInitIsoCreator:
     tmp_lst = []
     for item in self.user_data["users"]:
       if "passwd" in item:
-        item["passwd"] = passlib.hash.sha512_crypt.hash(item["passwd"])
+        # item["passwd"] = passlib.hash.sha512_crypt.hash(item["passwd"])
+        # is besser mit SALT!
+        dpwd = item["passwd"].encode("utf-8")
+        item["passwd"] = bcrypt.hashpw(dpwd, salt=bcrypt.gensalt(14)).decode() 
     tmp_lst.append(item)
 
     tmp_dic = self.user_data.copy()

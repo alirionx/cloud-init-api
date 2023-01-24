@@ -114,7 +114,7 @@ export default{
 }
 .isosTable{
   margin: 10px auto 14px auto;
-  width: 98%;
+  width: 100%;
   max-width: 1600px;
   font-size: 15px;
   padding:0px;
@@ -141,10 +141,15 @@ export default{
 }
 .icoBtn{
   height: 28px;
-  margin: -6px;
+  margin: -7px;
   border-radius: 4px;
   cursor: pointer;
+  border: 1px solid rgba(0,0,0,0);
 }
+.icoBtn:hover{
+  border: 1px solid #333;
+}
+
 .actionMenu .frame{
   z-index: 2;
   position: absolute;
