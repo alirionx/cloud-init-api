@@ -25,7 +25,7 @@
               <span>Instance Id:</span>
             </th>
             <td>
-              <input type="text" required v-model="formData.instance_id" placeholder="*" />
+              <input type="text" required v-model="formData.meta_data.instance_id" placeholder="*" />
             </td>
           </tr></table>
           <table class="formElm"><tr>
@@ -33,7 +33,7 @@
               <span>Hostname::</span>
             </th>
             <td>
-              <input type="text" required v-model="formData.local_hostname" placeholder="*" />
+              <input type="text" required v-model="formData.meta_data.local_hostname" placeholder="*" />
             </td>
           </tr></table>
         </div>
@@ -44,7 +44,7 @@
               <span>Distro Name:</span>
             </th>
             <td>
-              <input type="text" v-model="formData.distro" placeholder="" />
+              <input type="text" v-model="formData.meta_data.distro" placeholder="" />
             </td>
           </tr></table>
           <table class="formElm"><tr>
@@ -52,7 +52,7 @@
               <span>Distro Version:</span>
             </th>
             <td>
-              <input type="text" v-model="formData.distro_version" placeholder="" />
+              <input type="text" v-model="formData.meta_data.distro_version" placeholder="" />
             </td>
           </tr></table>
         </div>
@@ -353,7 +353,7 @@ export default {
         "network_config": {
           src_nic_match: "eth*",
           tgt_nic_name: "eth0",
-          dhcp4: false,
+          dhcp4: true,
           ip4_cidrs: [""],
           ip4_gw: null,
           nameservers: [],
