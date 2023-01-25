@@ -83,10 +83,11 @@ export default{
       window.open(dl_url)
     },
     delete_call(){
-      console.log("delete: " + this.action_idx)
-      this.store.delete_iso_by_idx(this.action_idx)
-      
-    },
+      let isoName = this.store.isos[this.action_idx].name
+      this.store.system_confirm.message = "Do you really want to delete iso '"+isoName+"'?"
+      let idx = this.action_idx
+      this.store.system_confirm.forward = ()=>{ this.store.delete_iso_by_idx(idx) }
+    }
 
   },
   mounted(){
@@ -144,10 +145,9 @@ export default{
   margin: -7px;
   border-radius: 4px;
   cursor: pointer;
-  border: 1px solid rgba(0,0,0,0);
 }
 .icoBtn:hover{
-  border: 1px solid #333;
+  box-shadow: 1px 1px 2px #444;
 }
 
 .actionMenu .frame{

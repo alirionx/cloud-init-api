@@ -98,7 +98,7 @@ class CloudInitIsoCreator:
         # is besser mit SALT!
         dpwd = item["passwd"].encode("utf-8")
         item["passwd"] = bcrypt.hashpw(dpwd, salt=bcrypt.gensalt(14)).decode() 
-    tmp_lst.append(item)
+      tmp_lst.append(item)
 
     tmp_dic = self.user_data.copy()
     tmp_dic["users"] = tmp_lst

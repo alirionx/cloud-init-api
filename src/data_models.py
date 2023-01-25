@@ -32,15 +32,14 @@ class User(BaseModel):
   ssh_authorized_keys: str | None = None
   sudo: str | None = None
   shell: Literal["/bin/sh", "/bin/bash", "/bin/zsh"] | None = None
-  package_update: bool | None = False 
-  package_upgrade: bool | None = False
-  packages: list[str] | None = None
-
 
 #---------------------
 class UserData(BaseModel):
+  package_update: bool | None = False 
+  package_upgrade: bool | None = False
+  packages: list[str] | None = None
   groups: list | None = None
-  users: list[User] | None = None
+  users: list[User] | None = []
 
 #---------------------
 class CloudConfig(BaseModel):

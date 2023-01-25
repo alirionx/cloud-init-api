@@ -10,7 +10,7 @@
       <!------------------------------------------------------------->
       <div class="cloudConfigDiv">
         <div class="hl">General Parameters</div>
-        
+        <img src="@/assets/icon_loadconfig.png" class="optBtn" @click="set_show_config_load" />
         <div class="formCard">
           <table class="formElm"><tr>
             <th>
@@ -30,15 +30,17 @@
           </tr></table>
           <table class="formElm"><tr>
             <th>
-              <span>Hostname::</span>
+              <span>Hostname:</span>
             </th>
             <td>
-              <input type="text" required v-model="formData.meta_data.local_hostname" placeholder="*" />
+              <input 
+                type="text" 
+                required 
+                pattern="^[a-zA-Z0-9-]{4,16}$"
+                v-model="formData.meta_data.local_hostname" 
+                placeholder="*" />
             </td>
           </tr></table>
-        </div>
-
-        <div class="formCard">
           <table class="formElm"><tr>
             <th>
               <span>Distro Name:</span>
@@ -55,6 +57,49 @@
               <input type="text" v-model="formData.meta_data.distro_version" placeholder="" />
             </td>
           </tr></table>
+        </div>
+
+        <div class="formCard">
+          <table class="formElm"><tr>
+            <th>
+              <span>Package Update:</span>
+            </th>
+            <td>
+              <input type="checkbox" v-model="formData.user_data.package_update" />
+            </td>
+          </tr></table>
+
+          <table class="formElm"><tr>
+            <th>
+              <span>Package Upgrade:</span>
+            </th>
+            <td>
+              <input type="checkbox" v-model="formData.user_data.package_upgrade" />
+            </td>
+          </tr></table>
+          
+          <table class="formElm"><tr>
+            <th>
+              <span>Packages:</span>
+              <button 
+                type="button" 
+                class="inCellBtn" 
+                @click="add_entry(formData.user_data.packages)">+</button>
+            </th>
+            <td>
+              <div style="position:relative;" v-for="(grp, idx2) in formData.user_data.packages" :key="idx2" >
+                <button 
+                  type="button" 
+                  class="inCellBtn" 
+                  @click="del_entry(formData.user_data.packages, idx2)">-</button>
+                <input 
+                  type="text" 
+                  v-model="formData.user_data.packages[idx2]" 
+                  placeholder="e.g. git" />
+              </div>
+            </td>
+          </tr></table>
+          
         </div>
 
       </div>
@@ -108,6 +153,7 @@
                 <input 
                   type="text" 
                   v-model="formData.network_config.ip4_cidrs[idx]" 
+                  pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))$"
                   placeholder="e.g. 192.168.0.10/24" />
               </div>
             </td>
@@ -117,7 +163,11 @@
               <span>IPv4 Gateway:</span>
             </th>
             <td>
-              <input type="text" v-model="formData.network_config.ip4_gw" placeholder="e.g. 192.168.0.1" />
+              <input 
+                type="text" 
+                v-model="formData.network_config.ip4_gw" 
+                pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$"
+                placeholder="e.g. 192.168.0.1" />
             </td>
           </tr></table>
           <table class="formElm"><tr>
@@ -137,6 +187,7 @@
                 <input 
                   type="text" 
                   v-model="formData.network_config.nameservers[idx]" 
+                  pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$"
                   placeholder="e.g. 8.8.8.8" />
               </div>
             </td>
@@ -169,16 +220,22 @@
       <!------------------------------------------------------------->
       <div class="cloudConfigDiv">
         <div class="hl">Users</div>
-        <img src="@/assets/icon_useradd.png" class="userAddBtn" @click="add_user" />
+        <img src="@/assets/icon_useradd.png" class="optBtn" @click="add_user" />
 
         <div class="userSeparator" v-for="(user, idx) in formData.user_data.users" :key="idx">
+          <img src="@/assets/icon_userdel.png" class="optBtn del" @click="del_user(idx)" />
           <div class="formCard">
             <table class="formElm"><tr>
               <th>
                 <span>Username:</span>
               </th>
               <td>
-                <input type="text" required v-model="formData.user_data.users[idx].name" placeholder="*" />
+                <input 
+                  type="text" 
+                  required 
+                  v-model="formData.user_data.users[idx].name" 
+                  pattern="^[a-zA-Z0-9-]{2,16}$"
+                  placeholder="*" />
               </td>
             </tr></table>
             <table class="formElm"><tr>
@@ -186,7 +243,12 @@
                 <span>Password:</span>
               </th>
               <td>
-                <input type="password" required v-model="formData.user_data.users[idx].passwd" placeholder="*" />
+                <input 
+                  type="password" 
+                  required 
+                  v-model="formData.user_data.users[idx].passwd" 
+                  min="4"
+                  placeholder="*" />
               </td>
             </tr></table>
 
@@ -209,15 +271,6 @@
                   <option value="/bin/bash">/bin/bash</option>
                   <option value="/bin/zsh">/bin/zsh</option>
                 </select>
-              </td>
-            </tr></table>
-
-            <table class="formElm"><tr>
-              <th>
-                <span>Sudo Rules:</span>
-              </th>
-              <td>
-                <input type="text" required v-model="formData.user_data.users[idx].sudo" placeholder="" />
               </td>
             </tr></table>
 
@@ -247,40 +300,19 @@
           <div class="formCard">
             <table class="formElm"><tr>
               <th>
-                <span>SSH Password Auth:</span>
+                <span>Sudo Rules:</span>
               </th>
               <td>
-                <input type="checkbox" v-model="formData.user_data.users[idx].ssh_pwauth" />
-              </td>
-            </tr></table>
-            <table class="formElm"><tr>
-              <th>
-                <span>Package Update:</span>
-              </th>
-              <td>
-                <input type="checkbox" v-model="formData.user_data.users[idx].package_update" />
+                <input type="text" required v-model="formData.user_data.users[idx].sudo" placeholder="" />
               </td>
             </tr></table>
             
             <table class="formElm"><tr>
               <th>
-                <span>Packages:</span>
-                <button 
-                  type="button" 
-                  class="inCellBtn" 
-                  @click="add_entry(formData.user_data.users[idx].packages)">+</button>
+                <span>SSH Password Auth:</span>
               </th>
               <td>
-                <div style="position:relative;" v-for="(grp, idx2) in formData.user_data.users[idx].packages" :key="idx2" >
-                  <button 
-                    type="button" 
-                    class="inCellBtn" 
-                    @click="del_entry(formData.user_data.users[idx].packages, idx2)">-</button>
-                  <input 
-                    type="text" 
-                    v-model="formData.user_data.users[idx].packages[idx2]" 
-                    placeholder="e.g. git" />
-                </div>
+                <input type="checkbox" v-model="formData.user_data.users[idx].ssh_pwauth" />
               </td>
             </tr></table>
 
@@ -300,12 +332,27 @@
       
       <!------------------------------------------------------------->
 
-      <div>
+      <div class="mainBtnFrame">
         <button type="submit">submit</button>
+        <button type="button" @click="reset_form_data">reset</button>
       </div>
-         
       </form>
     </div>
+    <!------------------------------------------------------------->
+    <div class="actionFormFrame" v-if="show_config_load">
+      <div class="actionFormBox">
+        <div class="hl">Load from existing Config</div>
+        <div class="ipt_hl">Config Name</div>
+        <select v-model="loaded_config">
+          <option v-for="(item, idx) in store.isos" :value="idx">{{ item.name }}</option>
+        </select>
+        <div class="btnFrame">
+          <button @click="load_config">load</button>
+          <button @click="reset_show_config_load">close</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -323,7 +370,8 @@ export default {
       id: "form",
       title: "CloudInit Iso Creation - Form",
       active: true,
-
+      show_config_load: false,
+      loaded_config: null,
       userModel:{
         name: null,
         passwd: null,
@@ -333,10 +381,7 @@ export default {
         sudo: "ALL=(ALL) NOPASSWD:ALL",
         groups: [ "sudo" ],
         ssh_pwauth: false,
-        ssh_authorized_keys: null,
-        package_update: false,
-        packages: [],
-        // package_upgrade: false
+        ssh_authorized_keys: null
       },
 
       formData: {
@@ -348,6 +393,9 @@ export default {
           distro_version: null
         },
         user_data: {
+          package_update: false,
+          package_upgrade: false,
+          packages: [],
           users: []
         },
         "network_config": {
@@ -359,7 +407,8 @@ export default {
           nameservers: [],
           searches: []
         }
-      }
+      },
+      tmpFormData:{}
 
     }
   },
@@ -367,15 +416,29 @@ export default {
     switch_component(){
       this.active = !this.active
     },
+
+    reset_form_data(){
+      this.formData = JSON.parse(JSON.stringify(this.tmpFormData));
+    },
+
+    set_show_config_load(){
+      this.show_config_load = true;
+    },
+    reset_show_config_load(){
+      this.show_config_load = false;
+    },
+
     add_entry(ary){
       if(ary[ary.length-1] == ""){
         return
       }
       ary.push("")
     },
+
     del_entry(ary, idx){
       ary.splice(idx, 1)
     }, 
+
     add_user(){
       console.log("new User")
       // let userItem = {...this.userModel}
@@ -383,10 +446,48 @@ export default {
       this.formData.user_data.users.push(userItem)
 
     },
+
+    del_user(idx){
+      this.formData.user_data.users.splice(idx, 1)
+    }, 
+
+    clear_empty_vals(obj){
+      let tmp_obj = JSON.parse(JSON.stringify(obj));
+      var isArray = tmp_obj instanceof Array;
+      for (var k in tmp_obj){
+        //syntax/kurzschreibweise hier verstehe ich nich... 
+        if (tmp_obj[k]===null||tmp_obj[k]==="") isArray ? tmp_obj.splice(k,1) : delete tmp_obj[k]; 
+        else if (typeof tmp_obj[k]=="object") this.clear_empty_vals(tmp_obj[k]);
+      }
+      return tmp_obj;
+    },
+
     submit_form(){
-      console.log(this.formData)
+      this.store.set_loader();
+      let data = this.clear_empty_vals(this.formData)
+      if(data.network_config.dhcp4){
+        delete data.network_config["ip4_cidrs"];
+        delete data.network_config["ip4_gw"];
+      }
+      let callback = ()=>{
+        this.store.reset_loader()
+        this.reset_form_data()
+      }
+      this.store.create_iso(data, callback) 
+    },
+    load_config(){
+      if(this.loaded_config === null) return
+      // console.log(this.store.isos[this.loaded_config])
+      console.log( JSON.parse(JSON.stringify(this.store.isos[this.loaded_config].class_config_data)) )
+      this.formData = JSON.parse(
+        JSON.stringify(this.store.isos[this.loaded_config].class_config_data)
+      );
+      this.reset_show_config_load()
     }
   },
+  mounted: function(){
+    this.tmpFormData = JSON.parse(JSON.stringify(this.formData));
+  }
 };
 </script>
 
@@ -404,20 +505,25 @@ export default {
   font-weight: bold;
   color: #000;
   text-align: left;
-  padding: 0 0 6px 0;
+  padding: 0 0 8px 0;
   margin-top: -4px;
 }
-.cloudConfigDiv .userAddBtn{
-  height: 40px;
+.cloudConfigDiv .optBtn{
+  height: 34px;
   cursor: pointer;
   border-radius: 4px;
   position: absolute;
   top:8px;
-  right:10px;
-  border: 1px solid rgba(0,0,0,0);
+  right:18px;
+  
 }
-.cloudConfigDiv .userAddBtn:hover{
-  border: 1px solid #333;
+.cloudConfigDiv .optBtn:hover{
+  box-shadow: 1px 1px 2px #444;
+}
+.cloudConfigDiv .del{
+  height: 28px;
+  right:4px;
+  top:10px;
 }
 
 .formCard{
@@ -437,7 +543,7 @@ export default {
   width: 100%;
 }
 .formCard .formElm th{
-  padding:6px;
+  padding:4px 4px 4px 6px;
   background-color: rgb(87, 109, 126);
   color: #fff;
   font-size: 14px;
@@ -453,15 +559,15 @@ export default {
 
 .formCard .inCellBtn{
   position: absolute;
-  right: 6px;
-  top: 6px;
+  right: 5px;
+  top: 5px;
   font-weight: bold;
   cursor: pointer;
 }
 
 .formCard input[type=text], input[type=password], input[type=number]{
   margin: -1px 0 0 4px;
-  padding: 8px 8px 9px 8px;
+  padding: 5px 5px 8px 5px;
   width:96%;
   font-size: 15px;
   border: 1px solid #666;
@@ -491,16 +597,34 @@ export default {
   resize: none;
   /* box-shadow: 0px 1px 2px #444; */
 }
-
 .userSeparator{
-  border-bottom: 2px solid #444;
-  margin-bottom: 8px;
-  padding: 4px 0 12px 0;
+  margin-top: 12px;
+  padding: 14px 0 2px 0;
+  border-top: 2px solid #444;
+  position:relative;
 }
-.userSeparator:last-child{
-  border-bottom: 0px;
-  margin-bottom: 0px;
+
+.mainBtnFrame{
+  padding:4px;
+  text-align: center;
 }
+.mainBtnFrame button{
+  min-width: 120px;
+  padding: 6px 12px 6px 12px;
+  margin: 0px 10px 0px 10px;
+  border-radius: 4px;
+  text-align: center;
+  background-color: rgb(62, 79, 93);
+  color:#fff;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+}
+.mainBtnFrame button:hover{
+  box-shadow: 1px 1px 2px #444;
+}
+
 
 
 
