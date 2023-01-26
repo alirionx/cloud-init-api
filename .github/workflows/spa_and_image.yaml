@@ -16,8 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          repository: alirionx/cloud-init-api
-          path: cloud-init-api
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Use Node.js 18
         uses: actions/setup-node@v3
