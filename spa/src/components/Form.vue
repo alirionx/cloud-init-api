@@ -306,7 +306,7 @@
                 <input type="text" required v-model="formData.user_data.users[idx].sudo" placeholder="" />
               </td>
             </tr></table>
-            
+
             <table class="formElm"><tr>
               <th>
                 <span>SSH Password Auth:</span>
@@ -369,7 +369,7 @@ export default {
     return {
       id: "form",
       title: "CloudInit Iso Creation - Form",
-      active: true,
+      active: false,
       show_config_load: false,
       loaded_config: null,
       userModel:{
