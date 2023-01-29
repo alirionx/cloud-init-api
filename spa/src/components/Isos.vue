@@ -36,7 +36,7 @@
     </div>
     <IsoDetails 
       v-if="selected_details!=null"
-      v-bind:iso_idx="selected_details" 
+      v-bind:iso_id="selected_details" 
       v-bind:callback="reset_selected_details"  />
   </div>
 </template>
@@ -92,7 +92,7 @@ export default{
       this.store.system_confirm.forward = ()=>{ this.store.delete_iso_by_idx(idx) }
     },
     set_selected_details(idx){
-      this.selected_details = idx;
+      this.selected_details = this.store.isos[idx].iso_id;
     },
     reset_selected_details(){
       this.selected_details = null;

@@ -1,7 +1,7 @@
 <template>
   <div class="actionFormFrame">
     <div class="actionFormBox cusBox">
-      <div class="hl">Cloud init Iso Details: {{ iso_name }}</div>
+      <div class="hl">Cloud init Iso Details: {{ this.iso_id }}</div>
 
       <div  v-if="details_data.meta_data" >
         <div class="ta_hl">Meta Data</div>
@@ -32,7 +32,7 @@
 
   export default {
     props:{
-      iso_idx: Number,
+      iso_id: String,
       callback: Function,
     },
     setup(){
@@ -41,7 +41,6 @@
   },
     data(){
       return{
-        iso_name: "",
         file_list:{
           "meta-data": "meta_data",
           "user-data": "user_data",
@@ -57,7 +56,7 @@
     methods:{
       call_iso_deatais(){
         for(const [fn, prop] of Object.entries(this.file_list) ){
-          axios.get("/api/isos/raw/"+this.store.isos[this.iso_idx].iso_id+"/"+fn)
+          axios.get("/api/isos/raw/"+this.iso_id+"/"+fn)
           .then((resp=>{
             this.details_data[prop] = resp.data;
           }))
@@ -68,7 +67,6 @@
       }
     },
     mounted: function(){
-      this.iso_name = this.store.isos[this.iso_idx].name;
       this.call_iso_deatais();
     }
   }
