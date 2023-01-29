@@ -23,7 +23,7 @@
               <div class="actionMenu">
                 <img class="icoBtn" src="@/assets/icon_action.png" @click="set_action_idx(idx)" />
                 <div class="frame" v-if="action_idx===idx">
-                  <div class="btn" @click="details_call">Details</div>
+                  <div class="btn" @click="set_selected_details(idx)">Details</div>
                   <div class="btn" @click="download_call">Download</div>
                   <div class="btn" @click="delete_call">Delete</div>
                 </div>
@@ -34,12 +34,17 @@
         </tbody>
       </table>
     </div>
+    <IsoDetails 
+      v-if="selected_details!=null"
+      v-bind:iso_idx="selected_details" 
+      v-bind:callback="reset_selected_details"  />
   </div>
 </template>
 
 
 <script>
 import { useMainStore } from '@/stores/mainStore'
+import IsoDetails from '@/components/IsoDetails.vue'
 
 export default{
   name: "Isos",
@@ -47,15 +52,17 @@ export default{
     const store = useMainStore()
     return { store }
   }, 
+  components:{
+    IsoDetails
+  },
   data(){
     return {
       id: "isos",
       title: "Stored CloudInit Isos",
       active: true,
       action_idx: null,
-      defi: [
-       
-      ]
+      defi: [],
+      selected_details: null
     }
   },
   methods:{
@@ -73,10 +80,6 @@ export default{
     reset_action_idx(){
       this.action_idx = null
     },
-
-    details_call(){
-      console.log("details: " + this.action_idx)
-    },
     download_call(){
       console.log("download: " + this.action_idx)
       let dl_url = "/api/iso/"+this.store.isos[this.action_idx].iso_id
@@ -87,6 +90,12 @@ export default{
       this.store.system_confirm.message = "Do you really want to delete iso '"+isoName+"'?"
       let idx = this.action_idx
       this.store.system_confirm.forward = ()=>{ this.store.delete_iso_by_idx(idx) }
+    },
+    set_selected_details(idx){
+      this.selected_details = idx;
+    },
+    reset_selected_details(){
+      this.selected_details = null;
     }
 
   },
