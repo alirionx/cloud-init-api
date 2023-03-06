@@ -110,6 +110,16 @@ body {
   padding: 12px 10px 4px 0px;
 }
 
+.actionFormBox input[type=text]{
+  padding: 6px;
+  width: 97%;
+  /* min-width: 100px; */
+  background-color: #fff;
+  font-size: 15px;
+  box-shadow: 1px 1px 2px #666; 
+  border: 0.5px solid #555;
+}
+
 .actionFormBox select{
   padding: 6px;
   width: 98%;

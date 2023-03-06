@@ -303,7 +303,7 @@
                 <span>Sudo Rules:</span>
               </th>
               <td>
-                <input type="text" required v-model="formData.user_data.users[idx].sudo" placeholder="" />
+                <input type="text" v-model="formData.user_data.users[idx].sudo" placeholder="" />
               </td>
             </tr></table>
 

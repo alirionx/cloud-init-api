@@ -11,6 +11,7 @@ from fastapi.responses import StreamingResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
 from data_models import IsoMetaData, CloudConfig
+import helpers
 from tools import CloudInitIsoCreator
 
 #-Build and prep the App----------------------------------------
@@ -46,14 +47,20 @@ async def api_isos_get():
 
 #--------------------
 @app.get("/api/iso/{id}", tags=["iso"] )
-def api_iso_get(id):
+def api_iso_get(id, filename=None):
+
+  if filename: 
+    iso_download_filename = helpers.string_to_valid_filename(string=filename)
+  else:
+    iso_download_filename = helpers.string_to_valid_filename(string=id)
+
   try:
     stream = CloudInitIsoCreator.get_iso_as_byte(iso_id=id)
   except Exception as e:
     return HTTPException(status_code=400, detail=str(e))
   return StreamingResponse(
     stream,
-    headers={'Content-Disposition': 'attachment; filename="%s.iso"' %id}
+    headers={'Content-Disposition': 'attachment; filename="%s"' %iso_download_filename}
   )
 
 #--------------------

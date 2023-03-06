@@ -24,7 +24,8 @@
                 <img class="icoBtn" src="@/assets/icon_action.png" @click="set_action_idx(idx)" />
                 <div class="frame" v-if="action_idx===idx">
                   <div class="btn" @click="set_selected_details(idx)">Details</div>
-                  <div class="btn" @click="download_call">Download</div>
+                  <div class="btn" @click="download_do">Download</div>
+                  <div class="btn" @click="set_rename_download">Renamed Dl</div>
                   <div class="btn" @click="delete_call">Delete</div>
                 </div>
               </div>  
@@ -38,6 +39,13 @@
       v-if="selected_details!=null"
       v-bind:iso_id="selected_details" 
       v-bind:callback="reset_selected_details"  />
+
+    <RenameDownload 
+      v-if="selected_rename_download!=null"
+      v-bind:selected_rename_download="selected_rename_download" 
+      v-bind:set_dl_filename="set_dl_filename" 
+      v-bind:fw_func="download_do" 
+      v-bind:callback="reset_rename_download"  />
   </div>
 </template>
 
@@ -45,6 +53,7 @@
 <script>
 import { useMainStore } from '@/stores/mainStore'
 import IsoDetails from '@/components/IsoDetails.vue'
+import RenameDownload from '@/components/RenameDownload.vue'
 
 export default{
   name: "Isos",
@@ -53,7 +62,8 @@ export default{
     return { store }
   }, 
   components:{
-    IsoDetails
+    IsoDetails,
+    RenameDownload
   },
   data(){
     return {
@@ -62,7 +72,9 @@ export default{
       active: true,
       action_idx: null,
       defi: [],
-      selected_details: null
+      selected_details: null,
+      selected_rename_download: null,
+      dl_filename: null
     }
   },
   methods:{
@@ -80,11 +92,24 @@ export default{
     reset_action_idx(){
       this.action_idx = null
     },
-    download_call(){
+    
+    set_dl_filename(filename){
+      // console.log(filename)
+      this.dl_filename = filename
+      this.download_do()
+    },
+    download_do(){
       console.log("download: " + this.action_idx)
-      let dl_url = "/api/iso/"+this.store.isos[this.action_idx].iso_id
+      let dl_url;
+      if(this.dl_filename){
+        dl_url = "/api/iso/"+this.selected_rename_download+"?filename="+this.dl_filename
+      }
+      else{
+        dl_url = "/api/iso/"+this.store.isos[this.action_idx].iso_id
+      }
       window.open(dl_url)
     },
+
     delete_call(){
       let isoName = this.store.isos[this.action_idx].name
       this.store.system_confirm.message = "Do you really want to delete iso '"+isoName+"'?"
@@ -96,6 +121,13 @@ export default{
     },
     reset_selected_details(){
       this.selected_details = null;
+    },
+    set_rename_download(){
+      this.selected_rename_download = this.store.isos[this.action_idx].iso_id;
+    },
+    reset_rename_download(){
+      this.selected_rename_download = null;
+      this.dl_filename = null;
     }
 
   },
